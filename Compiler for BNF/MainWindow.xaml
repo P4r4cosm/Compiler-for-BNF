@@ -5,28 +5,40 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Compiler_for_BNF"
         mc:Ignorable="d"
-        Title="Compiler" Height="450" Width="800" Background="#FFFAFA"
+        Title="Compiler" Height="450" Width="800" Background="#F5F5F5"
         Icon="Resources/mainIcon.png">
 
     <Window.Resources>
+        <!-- Основные палитра и цвета -->
+        <SolidColorBrush x:Key="PrimaryBackgroundBrush" Color="#F5F5F5"/>
+        <SolidColorBrush x:Key="ControlBackgroundBrush" Color="White"/>
+        <SolidColorBrush x:Key="ControlBorderBrush" Color="#AAAAAA"/>
+        <SolidColorBrush x:Key="ControlForegroundBrush" Color="#333333"/>
+        <SolidColorBrush x:Key="HoverBorderBrush" Color="#888888"/>
+        <SolidColorBrush x:Key="FocusBorderBrush" Color="#666666"/>
+        <SolidColorBrush x:Key="ScrollBarBackgroundBrush" Color="#E0E0E0"/>
+        <SolidColorBrush x:Key="ScrollBarForegroundBrush" Color="#A0A0A0"/>
+        <SolidColorBrush x:Key="ScrollBarThumbBrush" Color="#C0C0C0"/>
+        <SolidColorBrush x:Key="ButtonHoverBackgroundBrush" Color="#E6E6E6"/>
+        <SolidColorBrush x:Key="ButtonPressedBackgroundBrush" Color="#CCCCCC"/>
+
+        <!-- Стиль для ScrollViewer -->
         <Style TargetType="ScrollViewer">
-            <Setter Property="Background" Value="#505050"/>
+            <Setter Property="Background" Value="Transparent"/>
         </Style>
-        <!-- Стиль для ScrollBar -->
+
+        <!-- Стиль для ScrollBar с использованием общих ресурсов -->
         <Style TargetType="ScrollBar">
-            <Setter Property="Background" Value="#505050"/>
-            <Setter Property="Foreground" Value="#676767"/>
-            <Setter Property="Width" Value="10"/>
-            <!-- Ширина ScrollBar -->
+            <Setter Property="Background" Value="{StaticResource ScrollBarBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource ScrollBarForegroundBrush}"/>
+            <Setter Property="Width" Value="12"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
                         <Grid Background="{TemplateBinding Background}">
                             <Track x:Name="PART_Track">
                                 <Track.Thumb>
-                                    <Thumb Margin="3" 
-       BorderThickness="8" BorderBrush="#FF868686" Background="#FF868686"/>
-
+                                    <Thumb Margin="2" Background="{StaticResource ScrollBarThumbBrush}" BorderThickness="0"/>
                                 </Track.Thumb>
                             </Track>
                         </Grid>
@@ -35,26 +47,80 @@
             </Setter>
         </Style>
 
-        <Style x:Key="TextBox" TargetType="TextBox">
+        <!-- Единый стиль для TextBox -->
+        <Style x:Key="UnifiedTextBoxStyle" TargetType="TextBox">
             <Setter Property="FontFamily" Value="Cascadia Code"/>
             <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Background" Value="#e0e1df"/>
-            <Setter Property="BorderBrush" Value="#242424"/>
-            <Setter Property="Foreground" Value="#242424"/>
-            <Setter Property="Margin" Value="20"/>
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ControlBorderBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource ControlForegroundBrush}"/>
+            <Setter Property="Margin" Value="15"/>
+            <Setter Property="Padding" Value="8"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1">
-                            <ScrollViewer x:Name="PART_ContentHost"  Background="{TemplateBinding Background}"/>
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="2" 
+                                CornerRadius="2">
+                            <ScrollViewer x:Name="PART_ContentHost" Background="{TemplateBinding Background}"/>
                         </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <!-- Эффект при наведении мыши -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource HoverBorderBrush}"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+                <!-- Эффект при фокусе -->
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource FocusBorderBrush}"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Единый стиль для Button -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <!-- В обычном состоянии граница не видна -->
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                        Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- При наведении появляется граница с изменённым цветом -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource HoverBorderBrush}"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource ButtonPressedBackgroundBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
     </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -64,30 +130,22 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="0.4*"/>
-            
         </Grid.RowDefinitions>
-        <!--TextBox для ввода-->
-        <TextBox x:Name="InputBox" Grid.Row="1" Grid.Column="0" Width="Auto"
-                Style="{StaticResource TextBox}"/>
-        <!--TextBox для БНФ-->
-        <TextBox x:Name="BNFBox" Grid.Row="1" Grid.Column="1" Width="Auto" IsReadOnly="True"
-         Style="{StaticResource TextBox}" />
-        
-        <!--TextBox для вывода результатов-->
-        <TextBox x:Name="OutputBox" Grid.Row="2" Grid.ColumnSpan="2" Width="Auto" IsReadOnly="True"
- Style="{StaticResource TextBox}" />
 
+        <!-- TextBox для ввода с единым стилем -->
+        <TextBox x:Name="InputBox" Grid.Row="1" Grid.Column="0"
+                 Style="{StaticResource UnifiedTextBoxStyle}"/>
+        <!-- TextBox для БНФ с единым стилем -->
+        <TextBox x:Name="BNFBox" Grid.Row="1" Grid.Column="1" IsReadOnly="True"
+                 Style="{StaticResource UnifiedTextBoxStyle}" />
+        <!-- TextBox для вывода результатов с единым стилем -->
+        <TextBox x:Name="OutputBox" Grid.Row="2" Grid.ColumnSpan="2" IsReadOnly="True"
+                 Style="{StaticResource UnifiedTextBoxStyle}" />
 
-        <StackPanel x:Name="ButtonStack" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
-            <Button x:Name="CompilationButton" Width="40" Height="40" Margin="5,10,20,5">
-                <Image Source="Resources/CompileButtonIcon.png" Stretch="Uniform" />
+        <StackPanel x:Name="ButtonStack" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button x:Name="CompilationButton" Width="40" Height="40" Margin="5,5,20,5">
+                <Image Source="Resources/CompileButtonIcon.png" Stretch="Uniform"/>
             </Button>
-
         </StackPanel>
-        <!--Compilation button-->
-         
-
-
-
     </Grid>
 </Window>
