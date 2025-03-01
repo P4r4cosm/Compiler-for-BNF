@@ -9,7 +9,7 @@
             <!-- Стиль для TextBox с закруглёнными углами и тенью -->
             <Style x:Key="CustomTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
                 <Setter Property="FontSize" Value="18"/>
-                <Setter Property="FontFamily" Value="Consolas Code"/>
+                <Setter Property="FontFamily" Value="Consolas"/>
                 <Setter Property="BorderBrush" Value="#BDBDBD"/>
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="Background" Value="White"/>
@@ -170,7 +170,7 @@
                 <Setter Property="Height" Value="5"/>
                 <!-- Высота для горизонтального разделителя -->
                 <Setter Property="VerticalAlignment" Value="Stretch"/>
-                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Margin" Value="6,0,6,0"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="GridSplitter">
@@ -188,7 +188,7 @@
                 <Setter Property="Width" Value="5"/>
                 <!-- Ширина для вертикального разделителя -->
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="Margin" Value="0,5,0,5"/>
+                <Setter Property="Margin" Value="0,6,0,6"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="GridSplitter">
@@ -245,7 +245,7 @@
             <materialDesign:Card Grid.Column="2" Margin="5">
                 <TextBox x:Name="BNFBox" 
                          Style="{StaticResource CustomTextBoxStyle}"
-                         materialDesign:HintAssist.Hint="BNF"
+                         Text="Output"
                          IsReadOnly="True" 
                          AcceptsReturn="True"
                          VerticalScrollBarVisibility="Auto"
@@ -260,9 +260,9 @@
         <materialDesign:Card Grid.Row="3" Margin="5">
             <TextBox x:Name="OutputBox" 
                      Style="{StaticResource CustomTextBoxStyle}"
-                     materialDesign:HintAssist.Hint="Output"
                      IsReadOnly="True" 
                      AcceptsReturn="True"
+                     Text="Output"
                      VerticalScrollBarVisibility="Auto"
                      TextWrapping="Wrap"/>
         </materialDesign:Card>
