@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Compiler_for_BNF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <BitmapImage x:Key="AppIcon" UriSource="Resources/app_icon.png" />
     </Application.Resources>
 </Application>

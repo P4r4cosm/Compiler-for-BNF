@@ -5,8 +5,89 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Compiler_for_BNF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Compiler" Height="450" Width="800" Background="#FFFAFA"
+        Icon="Resources/mainIcon.png">
+
+    <Window.Resources>
+        <Style TargetType="ScrollViewer">
+            <Setter Property="Background" Value="#505050"/>
+        </Style>
+        <!-- Стиль для ScrollBar -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="#505050"/>
+            <Setter Property="Foreground" Value="#676767"/>
+            <Setter Property="Width" Value="10"/>
+            <!-- Ширина ScrollBar -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Track x:Name="PART_Track">
+                                <Track.Thumb>
+                                    <Thumb Margin="3" 
+       BorderThickness="8" BorderBrush="#FF868686" Background="#FF868686"/>
+
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TextBox" TargetType="TextBox">
+            <Setter Property="FontFamily" Value="Cascadia Code"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Background" Value="#e0e1df"/>
+            <Setter Property="BorderBrush" Value="#242424"/>
+            <Setter Property="Foreground" Value="#242424"/>
+            <Setter Property="Margin" Value="20"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1">
+                            <ScrollViewer x:Name="PART_ContentHost"  Background="{TemplateBinding Background}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.4*"/>
+            
+        </Grid.RowDefinitions>
+        <!--TextBox для ввода-->
+        <TextBox x:Name="InputBox" Grid.Row="1" Grid.Column="0" Width="Auto"
+                Style="{StaticResource TextBox}"/>
+        <!--TextBox для БНФ-->
+        <TextBox x:Name="BNFBox" Grid.Row="1" Grid.Column="1" Width="Auto" IsReadOnly="True"
+         Style="{StaticResource TextBox}" />
+        
+        <!--TextBox для вывода результатов-->
+        <TextBox x:Name="OutputBox" Grid.Row="2" Grid.ColumnSpan="2" Width="Auto" IsReadOnly="True"
+ Style="{StaticResource TextBox}" />
+
+
+        <StackPanel x:Name="ButtonStack" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+            <Button x:Name="CompilationButton" Width="40" Height="40" Margin="5,10,20,5">
+                <Image Source="Resources/CompileButtonIcon.png" Stretch="Uniform" />
+            </Button>
+
+        </StackPanel>
+        <!--Compilation button-->
+         
+
+
 
     </Grid>
 </Window>
