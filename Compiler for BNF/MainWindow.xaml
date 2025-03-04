@@ -178,7 +178,7 @@
 
         <!-- Кнопка "Runtime" -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="0" Margin="0,0,20,10">
-            <Button Style="{StaticResource CustomButtonStyle}" Margin="5" Width="120" Height="40">
+            <Button Style="{StaticResource CustomButtonStyle}" Margin="5" Width="120" Height="40" Click="ComplileButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Play" VerticalAlignment="Center" Margin="0,0,5,0" />
                     <TextBlock Text="Runtime" VerticalAlignment="Center" FontFamily="Consolas" FontSize="18"/>
