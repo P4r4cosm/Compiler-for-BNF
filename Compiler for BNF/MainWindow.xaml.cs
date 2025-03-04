@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Compiler_for_BNF.Exceptions;
+using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +19,7 @@ namespace Compiler_for_BNF
     /// </summary>
     public partial class MainWindow : Window
     {
+        private RichTextBoxHelper RichTextBoxHelper;
         public MainWindow()
         {
 
@@ -35,8 +37,8 @@ namespace Compiler_for_BNF
             //Заполняем InputBox
             var textReaderCode = new TextReader("D:\\C# projects\\Compiler for BNF\\Compiler for BNF\\Resources\\StartCode.txt");
             var code= textReaderCode.GetInfo();
-            var richTextBoxHelper = new RichTextBoxHelper(InputBox);
-            richTextBoxHelper.SetRichTextBoxText(await code);
+            RichTextBoxHelper = new RichTextBoxHelper(InputBox);
+            RichTextBoxHelper.SetRichTextBoxText(await code);
 
         }
 
@@ -53,24 +55,18 @@ namespace Compiler_for_BNF
                 parser.ParseLanguage();
                 OutputBox.Text = "Программа корректна";
             }
+            catch (SymbolException ex)
+            {
+
+                var token = ex.Data["Token"] as Token;
+                RichTextBoxHelper.HighlightError(token.IndexInText, token.Size);
+                OutputBox.Text = $"Ошибка: {ex.Message}";
+            }
             catch (Exception ex)
             {
-                
-                var TextRange= new TextRange(InputBox.Document.ContentStart, InputBox.Document.ContentEnd); //считываем текст из richtextbox
-                string fullText=TextRange.Text; //получаем весь текст 
-                var start = InputBox.Document.ContentStart.GetPositionAtOffset(0); //берём первую букву слова
-                var end = start.GetPositionAtOffset(6+2); //последнюю букву слова
-                var word = new TextRange(start, end); //делаем из слова textRange
-                word.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Red); //красим фон
-
-
-
                 OutputBox.Text = $"Ошибка: {ex.Message}";
             }
         }
-
-
-
 
         //обработчики событий для вставки текста без сохранения форматирования из предыдущего документа
         private void PasteCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)

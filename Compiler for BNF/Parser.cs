@@ -10,7 +10,7 @@ public class Parser
         this.tokens = tokens;
     }
 
-    private Token CurrentToken => pos < tokens.Count ? tokens[pos] : new Token(TokenType.EndOfFile, "", 0, 0);
+    private Token CurrentToken => pos < tokens.Count ? tokens[pos] : new Token(TokenType.EndOfFile, "", 0, 0,0);
 
     private Token Consume(TokenType expectedType, string expectedValue = null)
     {

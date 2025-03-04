@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Compiler_for_BNF.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,7 +40,7 @@ namespace Compiler_for_BNF
                 MoveNext();
 
             if (CurrentChar == '\0')
-                return new Token(TokenType.EndOfFile, "", line, column);
+                return new Token(TokenType.EndOfFile, "", line, column,pos);
 
             if (char.IsLetter(CurrentChar))
                 return ReadIdentifierOrKeyword();
@@ -50,7 +51,7 @@ namespace Compiler_for_BNF
             if (Operators.Contains(CurrentChar.ToString()) || Punctuation.Contains(CurrentChar.ToString()))
                 return ReadOperatorOrPunctuation();
             // Вместо выбрасывания исключения – создаем токен ошибки и продвигаемся дальше
-            var errorToken = new Token(TokenType.Error, $"Недопустимый символ '{CurrentChar}' в строке: {line}, столбец {column}", line, column);
+            var errorToken = new Token(TokenType.Error, CurrentChar.ToString(), line, column,pos);
             MoveNext();
             return errorToken;
         }
@@ -96,7 +97,7 @@ namespace Compiler_for_BNF
                 }
             }
             TokenType type = Keywords.Contains(value) ? TokenType.Keyword : TokenType.Identifier;
-            return new Token(type, value, line, startCol);
+            return new Token(type, value, line, startCol,pos);
         }
 
 
@@ -109,7 +110,7 @@ namespace Compiler_for_BNF
                 sb.Append(CurrentChar);
                 MoveNext();
             }
-            return new Token(TokenType.Integer, sb.ToString(), line, startCol);
+            return new Token(TokenType.Integer, sb.ToString(), line, startCol,pos);
         }
 
         private Token ReadOperatorOrPunctuation()
@@ -118,7 +119,7 @@ namespace Compiler_for_BNF
             int startCol = column;
             MoveNext();
             TokenType type = Operators.Contains(value) ? TokenType.Operator : TokenType.Punctuation;
-            return new Token(type, value, line, startCol);
+            return new Token(type, value, line, startCol,pos);
         }
 
         // Собираем все токены в список
@@ -131,7 +132,7 @@ namespace Compiler_for_BNF
                 token = GetNextToken();
                 if (token.Type==TokenType.Error)
                 {
-                    throw new Exception($"{token.Value}");
+                    throw new SymbolException($"{token.Value}", token);
                 }
                 tokens.Add(token);
             } while (token.Type != TokenType.EndOfFile);

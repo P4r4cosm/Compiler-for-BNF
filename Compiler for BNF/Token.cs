@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,12 +23,16 @@ namespace Compiler_for_BNF
         public string Value { get; }
         public int Line { get; }
         public int Column { get; }
-        public Token(TokenType type, string value, int line, int column)
+        public int Size { get; }
+        public int IndexInText { get; }
+        public Token(TokenType type, string value, int line, int column,int index)
         {
             Type = type;
             Value = value;
             Line = line;
             Column = column;
+            IndexInText = index;
+            Size=value.Length;
         }
         public override string ToString() => $"{Type}: '{Value}' (Line {Line}, Col {Column})";
     }
