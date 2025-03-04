@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Compiler_for_BNF
 {
@@ -26,8 +27,17 @@ namespace Compiler_for_BNF
         }
         private async void LoadFileContentAsync()
         {
-            var textReader = new TextReader("D:\\C# projects\\Compiler for BNF\\Compiler for BNF\\Resources\\BNF.txt");
-            BNFBox.Text = await textReader.GetInfo();
+
+            //Заполняем BNFBox.Text
+            var textReaderBNF = new TextReader("D:\\C# projects\\Compiler for BNF\\Compiler for BNF\\Resources\\BNF.txt");
+            BNFBox.Text = await textReaderBNF.GetInfo();
+
+            //Заполняем InputBox
+            var textReaderCode = new TextReader("D:\\C# projects\\Compiler for BNF\\Compiler for BNF\\Resources\\StartCode.txt");
+            var code= textReaderCode.GetInfo();
+            var richTextBoxHelper = new RichTextBoxHelper(InputBox);
+            richTextBoxHelper.SetRichTextBoxText(await code);
+
         }
 
         private void ComplileButton_Click(object sender, RoutedEventArgs e)
