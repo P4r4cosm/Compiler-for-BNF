@@ -13,6 +13,7 @@
                 <Setter Property="BorderBrush" Value="#BDBDBD"/>
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="Background" Value="White"/>
+                <Setter Property="SelectionBrush" Value="#9C27B0"/>
                 <Setter Property="Padding" Value="5"/>
                 <Setter Property="Template">
                     <Setter.Value>
@@ -89,6 +90,7 @@
                 <Setter Property="Padding" Value="5"/>
                 <Setter Property="AcceptsReturn" Value="True"/>
                 <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+                <Setter Property="SelectionBrush" Value="#9C27B0"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="RichTextBox">
