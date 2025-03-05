@@ -239,10 +239,10 @@
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" MinHeight="200"/>
             <RowDefinition Height="5" />
-            <RowDefinition Height="300" />
+            <RowDefinition Height="300" MinHeight="100"/>
         </Grid.RowDefinitions>
 
         <!-- Кнопка "Runtime" -->
@@ -250,7 +250,7 @@
             <Button Style="{StaticResource CustomButtonStyle}" Margin="5" Width="120" Height="40" Click="ComplileButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Play" VerticalAlignment="Center" Margin="0,0,5,0" />
-                    <TextBlock Text="Runtime" VerticalAlignment="Center" FontFamily="Consolas" FontSize="18"/>
+                    <TextBlock Text="Запуск" VerticalAlignment="Center" FontFamily="Consolas" FontSize="18"/>
                 </StackPanel>
             </Button>
         </StackPanel>
@@ -258,40 +258,53 @@
         <!-- Основная область с InputBox и BNFBox -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MinWidth="200" />
+                <ColumnDefinition Width="*" MinWidth="250"/>
                 <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*" MinWidth="200" />
+                <ColumnDefinition Width="*" MinWidth="250"/>
             </Grid.ColumnDefinitions>
 
-            <!-- InputBox заменён на RichTextBox -->
+            <!-- InputBox с меткой -->
             <materialDesign:Card Grid.Column="0" Margin="5">
-                <RichTextBox x:Name="InputBox" 
-                             Style="{StaticResource CustomRichTextBoxStyle}"
-                             VerticalScrollBarVisibility="Auto">
-                    <RichTextBox.CommandBindings>
-                        <CommandBinding Command="ApplicationCommands.Paste" 
-                        Executed="PasteCommand_Executed" 
-                        CanExecute="PasteCommand_CanExecute">
-                        </CommandBinding>
-                    </RichTextBox.CommandBindings>
-                    <FlowDocument LineHeight="14">
-                        <Paragraph Margin="0" />
-                    </FlowDocument>
-                </RichTextBox>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Окно ввода программы" FontSize="24" FontFamily="Consolas" Foreground="#9C27B0" Margin="5"/>
+                    <RichTextBox Grid.Row="1" x:Name="InputBox" 
+                                 Style="{StaticResource CustomRichTextBoxStyle}"
+                                 VerticalScrollBarVisibility="Auto">
+                        <RichTextBox.CommandBindings>
+                            <CommandBinding Command="ApplicationCommands.Paste" 
+                                            Executed="PasteCommand_Executed" 
+                                            CanExecute="PasteCommand_CanExecute"/>
+                        </RichTextBox.CommandBindings>
+                        <FlowDocument LineHeight="14">
+                            <Paragraph Margin="0" />
+                        </FlowDocument>
+                    </RichTextBox>
+                </Grid>
             </materialDesign:Card>
 
             <!-- Разделитель между InputBox и BNFBox -->
             <GridSplitter Grid.Column="1" Style="{StaticResource VerticalGridSplitterStyle}"/>
 
-            <!-- BNFBox -->
+            <!-- BNFBox с меткой -->
             <materialDesign:Card Grid.Column="2" Margin="5">
-                <TextBox x:Name="BNFBox" 
-                         Style="{StaticResource CustomTextBoxStyle}"
-                         Text="Output"
-                         IsReadOnly="True" 
-                         AcceptsReturn="True"
-                         VerticalScrollBarVisibility="Auto"
-                         TextWrapping="Wrap"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="БНФ" FontSize="24" FontFamily="Consolas" Foreground="#9C27B0" Margin="5"/>
+                    <TextBox Grid.Row="1" x:Name="BNFBox" 
+                             Style="{StaticResource CustomTextBoxStyle}"
+                             Text="Output"
+                             IsReadOnly="True" 
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto"
+                             TextWrapping="Wrap"/>
+                </Grid>
             </materialDesign:Card>
         </Grid>
 
@@ -304,7 +317,7 @@
                      Style="{StaticResource CustomTextBoxStyle}"
                      IsReadOnly="True" 
                      AcceptsReturn="True"
-                     Text="Output"
+                     Text="Результат"
                      VerticalScrollBarVisibility="Auto"
                      TextWrapping="Wrap"/>
         </materialDesign:Card>
