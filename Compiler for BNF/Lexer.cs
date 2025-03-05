@@ -132,7 +132,7 @@ namespace Compiler_for_BNF
                 token = GetNextToken();
                 if (token.Type==TokenType.Error)
                 {
-                    throw new SymbolException($"{token.Value}", token);
+                    throw new SymbolException($"Неожиданный символ: {token.Value}, строка: {token.Line} столбец: {token.Column}", token);
                 }
                 tokens.Add(token);
             } while (token.Type != TokenType.EndOfFile);

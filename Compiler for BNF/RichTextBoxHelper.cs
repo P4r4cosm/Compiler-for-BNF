@@ -36,7 +36,7 @@ namespace Compiler_for_BNF
         }
         public void HighlightError(int index, int size)
         {
-            var start = RichTextBox.Document.ContentStart.GetPositionAtOffset(index + 2); //берём первую букву слова
+            var start = RichTextBox.Document.ContentStart.GetPositionAtOffset(index+2); //берём первую букву слова
             var end = start.GetPositionAtOffset(size); //последнюю букву слова
             var word = new TextRange(start, end); //делаем из слова textRange
             word.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Red); //красим фон

@@ -1,4 +1,5 @@
 ﻿using Compiler_for_BNF;
+using Compiler_for_BNF.Exceptions;
 using System.Windows;
 
 public class Parser
@@ -16,7 +17,7 @@ public class Parser
     {
         Token token = CurrentToken;
         if (token.Type != expectedType || (expectedValue != null && token.Value != expectedValue))
-            throw new Exception($"Ожидался {expectedType} со значением '{expectedValue}', а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}");
+            throw new SintaxException($"Ожидался {expectedType} со значением '{expectedValue}', а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}", token);
         pos++;
         return token;
     }

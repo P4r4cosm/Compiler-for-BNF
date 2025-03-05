@@ -44,11 +44,13 @@ namespace Compiler_for_BNF
 
         private void ComplileButton_Click(object sender, RoutedEventArgs e)
         {
+            var textRange = new TextRange(InputBox.Document.ContentStart, InputBox.Document.ContentEnd); //считываем текст из richtextbox
+            string code = textRange.Text;
 
+            RichTextBoxHelper.SetRichTextBoxText(code); // при каждом нажатии отчищаем стиль предыдущего текста
+            
             try
             {
-                var textRange = new TextRange(InputBox.Document.ContentStart, InputBox.Document.ContentEnd); //считываем текст из richtextbox
-                string code = textRange.Text;
                 Lexer lexer = new Lexer(code);
                 List<Token> tokens = lexer.Tokenize();
                 Parser parser = new Parser(tokens);
@@ -57,9 +59,16 @@ namespace Compiler_for_BNF
             }
             catch (SymbolException ex)
             {
-
                 var token = ex.Data["Token"] as Token;
                 RichTextBoxHelper.HighlightError(token.IndexInText, token.Size);
+                OutputBox.Text = $"Ошибка: {ex.Message}";
+            }
+            catch (SintaxException ex)
+            {
+                
+                var token = ex.Data["Token"] as Token;
+                MessageBox.Show(token.IndexInText.ToString()+"\n"+token.Size);
+                RichTextBoxHelper.HighlightError(token.IndexInText - token.Size, token.Size);
                 OutputBox.Text = $"Ошибка: {ex.Message}";
             }
             catch (Exception ex)
