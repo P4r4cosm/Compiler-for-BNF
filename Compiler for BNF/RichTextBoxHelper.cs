@@ -25,7 +25,8 @@ namespace Compiler_for_BNF
             // Создаём новый параграф с текстом
             Paragraph paragraph = new Paragraph(new Run(text))
             {
-                LineHeight = 14 // Устанавливаем межстрочное расстояние
+                LineHeight = 14,// Устанавливаем межстрочное расстояние
+                Margin = new System.Windows.Thickness(0)
             };
 
             // Добавляем параграф в документ

@@ -1,17 +1,20 @@
 ﻿using Compiler_for_BNF;
 using Compiler_for_BNF.Exceptions;
-using System.Windows;
+using System;
+using System.Collections.Generic;
 
 public class Parser
 {
     private readonly List<Token> tokens;
     private int pos = 0;
+    public Dictionary<string, int> variables = new Dictionary<string, int>();
+
     public Parser(List<Token> tokens)
     {
         this.tokens = tokens;
     }
 
-    private Token CurrentToken => pos < tokens.Count ? tokens[pos] : new Token(TokenType.EndOfFile, "", 0, 0,0);
+    private Token CurrentToken => pos < tokens.Count ? tokens[pos] : new Token(TokenType.EndOfFile, "", 0, 0, 0);
 
     private Token Consume(TokenType expectedType, string expectedValue = null)
     {
@@ -22,168 +25,191 @@ public class Parser
         return token;
     }
 
-    // Язык = "Начало" Множество ... Множество Слагаемое Опер ... Опер "Конец"
     public void ParseLanguage()
     {
-
-        string language = string.Empty;
-        foreach (Token token in tokens)
-        {
-            language = language + token.ToString() + "\t";
-
-        }
-        //MessageBox.Show(language);
         Consume(TokenType.Keyword, "Начало");
 
-        // Разбираем блоки Множество (может быть несколько)
         while (CurrentToken.Type == TokenType.Keyword && (CurrentToken.Value == "First" || CurrentToken.Value == "Second"))
         {
             ParseMnozhestvo();
         }
 
-        // Разделитель между блоком Множество и Слагаемое – запятая
-        Consume(TokenType.Punctuation, ",");
-        //MessageBox.Show(CurrentToken.Value);
-        // Разбираем слагаемое
         ParseSlagaemoe();
 
-        // Разбираем операторы до ключевого слова "Конец"
         while (CurrentToken.Type != TokenType.EndOfFile &&
                !(CurrentToken.Type == TokenType.Keyword && CurrentToken.Value == "Конец"))
         {
             ParseOper();
         }
+
         Consume(TokenType.Keyword, "Конец");
+
+        foreach (var kvp in variables)
+        {
+            Console.WriteLine($"{kvp.Key} = {kvp.Value}");
+        }
     }
 
-    // Множество = ("First" Перем { "," Перем }) | ("Second" Цел { Цел, причем если после целого идёт запятая – значит конец множества})
     private void ParseMnozhestvo()
     {
         if (CurrentToken.Value == "First")
         {
             Consume(TokenType.Keyword, "First");
-            ParseVariable();
-            // Разделитель между переменными – запятая
+            string varName = ParseVariable();
+            variables[varName] = 0;
             while (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == ",")
             {
                 Consume(TokenType.Punctuation, ",");
-                ParseVariable();
+                varName = ParseVariable();
+                variables[varName] = 0;
             }
         }
         else if (CurrentToken.Value == "Second")
         {
             Consume(TokenType.Keyword, "Second");
-            // Читаем целые числа для множества.
-            // Обязательно читаем хотя бы одно число.
-            ParseInteger();
-            // Пока следующий токен – целое число, смотрим, не стоит ли после него запятая.
+            // Читаем целые числа до первой запятой, которая относится к Слагаемому
+            List<int> secondNumbers = new List<int>();
+            secondNumbers.Add(ParseInteger());
+
             while (CurrentToken.Type == TokenType.Integer)
             {
-                // Если после текущего целого стоит запятая, значит список множетсва заканчивается.
-                if ((pos + 1) < tokens.Count &&
-                    tokens[pos + 1].Type == TokenType.Punctuation &&
-                    tokens[pos + 1].Value == ",")
+                // Смотрим, есть ли запятая после текущего числа
+                if (pos + 1 < tokens.Count && tokens[pos + 1].Type == TokenType.Punctuation && tokens[pos + 1].Value == ",")
                 {
-                    ParseInteger(); // Читаем последнее число множества.
-                    break;        // И выходим, не потребляя запятую – она станет разделителем.
+                    // Если есть запятая, это уже начало Слагаемого, выходим
+                    break;
                 }
-                else
-                {
-                    ParseInteger();
-                }
+                secondNumbers.Add(ParseInteger());
+            }
+
+            foreach (int value in secondNumbers)
+            {
+                variables[$"int_{value}"] = value;
             }
         }
         else
         {
-            throw new Exception("Ожидалось 'First' или 'Second' для множества.");
+            throw new SintaxException("Ожидалось 'First' или 'Second' для множества.", CurrentToken);
         }
     }
 
-    // Слагаемое = Цел { "," Цел } "Конец слагаемого"
     private void ParseSlagaemoe()
     {
-        ParseInteger();
+        int value = ParseInteger();
+        variables[$"slag_{value}"] = value;
         while (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == ",")
         {
             Consume(TokenType.Punctuation, ",");
-            ParseInteger();
+            value = ParseInteger();
+            variables[$"slag_{value}"] = value;
         }
         Consume(TokenType.Keyword, "Конец слагаемого");
     }
 
-    // Опер = Метка { Метка } ":" Перем "=" Прав.часть
     private void ParseOper()
     {
-        // Метка – целое число
-        ParseInteger();
+        List<int> labels = new List<int>();
+        labels.Add(ParseInteger());
         while (CurrentToken.Type == TokenType.Integer)
         {
-            ParseInteger();
+            labels.Add(ParseInteger());
         }
         Consume(TokenType.Punctuation, ":");
-        ParseVariable();
+        string varName = ParseVariable();
         Consume(TokenType.Operator, "=");
-        ParsePravChast();
+        int result = ParsePravChast();
+        variables[varName] = result;
     }
 
-    private void ParsePravChast()
+    private int ParsePravChast()
     {
+        bool isNegative = false;
         if (CurrentToken.Type == TokenType.Operator && CurrentToken.Value == "-")
+        {
             Consume(TokenType.Operator, "-");
-        ParseVyr1();
+            isNegative = true;
+        }
+        int result = ParseVyr1();
+        if (isNegative) result = -result;
+
         while (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "+" || CurrentToken.Value == "-"))
         {
-            Consume(TokenType.Operator);
-            ParseVyr1();
+            string op = Consume(TokenType.Operator).Value;
+            int next = ParseVyr1();
+            result = op == "+" ? result + next : result - next;
         }
+        return result;
     }
-    private void ParseVyr1()
+
+    private int ParseVyr1()
     {
-        ParseVyr2();
+        int result = ParseVyr2();
         while (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "*" || CurrentToken.Value == "/"))
         {
-            Consume(TokenType.Operator);
-            ParseVyr2();
+            string op = Consume(TokenType.Operator).Value;
+            int next = ParseVyr2();
+            result = op == "*" ? result * next : result / next;
         }
+        return result;
     }
-    private void ParseVyr2()
+
+    private int ParseVyr2()
     {
-        ParseVyr3();
-        while (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "v" || CurrentToken.Value == "^"))
+        int result = ParseVyr3();
+        while (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "&" || CurrentToken.Value == "|"))
         {
-            Consume(TokenType.Operator);
-            ParseVyr3();
+            string op = Consume(TokenType.Operator).Value;
+            int next = ParseVyr3();
+            result = op == "&" ? result & next : result | next; // "&" как AND, "|" как OR
         }
+        return result;
     }
-    private void ParseVyr3()
+
+    private int ParseVyr3()
     {
+        bool isNot = false;
         if (CurrentToken.Type == TokenType.Keyword && CurrentToken.Value == "not")
+        {
             Consume(TokenType.Keyword, "not");
-        ParseVyr4();
+            isNot = true;
+        }
+        int result = ParseVyr4();
+        return isNot ? ~result : result;
     }
-    private void ParseVyr4()
+
+    private int ParseVyr4()
     {
         if (CurrentToken.Type == TokenType.Identifier)
-            ParseVariable();
+        {
+            string varName = ParseVariable();
+            if (!variables.ContainsKey(varName))
+                throw new SintaxException($"Переменная {varName} не определена.", CurrentToken);
+            return variables[varName];
+        }
         else if (CurrentToken.Type == TokenType.Integer)
-            ParseInteger();
+        {
+            return ParseInteger();
+        }
         else if (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == "(")
         {
             Consume(TokenType.Punctuation, "(");
-            ParsePravChast();
+            int result = ParsePravChast();
             Consume(TokenType.Punctuation, ")");
+            return result;
         }
         else
         {
-            throw new Exception($"Ошибка в выражении: {CurrentToken}");
+            throw new SintaxException($"Ошибка в выражении: {CurrentToken}", CurrentToken);
         }
     }
-    private void ParseVariable()
+
+    private string ParseVariable()
     {
-        Consume(TokenType.Identifier);
+        return Consume(TokenType.Identifier).Value;
     }
-    private void ParseInteger()
+
+    private int ParseInteger()
     {
-        Consume(TokenType.Integer);
+        return int.Parse(Consume(TokenType.Integer).Value);
     }
 }

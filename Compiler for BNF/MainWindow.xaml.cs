@@ -36,7 +36,7 @@ namespace Compiler_for_BNF
 
             //Заполняем InputBox
             var textReaderCode = new TextReader("D:\\C# projects\\Compiler for BNF\\Compiler for BNF\\Resources\\StartCode.txt");
-            var code= textReaderCode.GetInfo();
+            var code = textReaderCode.GetInfo();
             RichTextBoxHelper = new RichTextBoxHelper(InputBox);
             RichTextBoxHelper.SetRichTextBoxText(await code);
 
@@ -48,14 +48,30 @@ namespace Compiler_for_BNF
             string code = textRange.Text;
 
             RichTextBoxHelper.SetRichTextBoxText(code); // при каждом нажатии отчищаем стиль предыдущего текста
-            
+
             try
             {
                 Lexer lexer = new Lexer(code);
                 List<Token> tokens = lexer.Tokenize();
+                var str = new StringBuilder();
+                foreach (Token token in tokens)
+                {
+                    str.AppendLine(token.ToString());
+                }
+                BNFBox.Text = str.ToString();
                 Parser parser = new Parser(tokens);
                 parser.ParseLanguage();
-                OutputBox.Text = "Программа корректна";
+                var variables = parser.variables;
+                if (variables.Count>0)
+                {
+                    var result = new StringBuilder();
+                    result.Append("Программа корректна\nРезультат: \n");
+                    foreach (var variable in variables)
+                    {
+                        result.Append($"{variable.Key} = {variable.Value}\n");
+                    }
+                    OutputBox.Text = result.ToString();
+                }
             }
             catch (SymbolException ex)
             {
@@ -65,9 +81,9 @@ namespace Compiler_for_BNF
             }
             catch (SintaxException ex)
             {
-                
+
                 var token = ex.Data["Token"] as Token;
-                MessageBox.Show(token.IndexInText.ToString()+"\n"+token.Size);
+                MessageBox.Show(token.IndexInText.ToString() + "\n" + token.Size);
                 RichTextBoxHelper.HighlightError(token.IndexInText - token.Size, token.Size);
                 OutputBox.Text = $"Ошибка: {ex.Message}";
             }
@@ -75,6 +91,7 @@ namespace Compiler_for_BNF
             {
                 OutputBox.Text = $"Ошибка: {ex.Message}";
             }
+
         }
 
         //обработчики событий для вставки текста без сохранения форматирования из предыдущего документа

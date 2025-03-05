@@ -18,7 +18,7 @@ namespace Compiler_for_BNF
         {
             "Начало", "First", "Second", "Конец", "Конец слагаемого", "not"
         };
-        private static readonly HashSet<string> Operators = new HashSet<string> { "+", "-", "*", "/", "v", "^", "=" };
+        private static readonly HashSet<string> Operators = new HashSet<string> { "+", "-", "*", "/", "|", "&", "=" };
         private static readonly HashSet<string> Punctuation = new HashSet<string> { ",", ":", "(", ")" };
 
         public Lexer(string input)
