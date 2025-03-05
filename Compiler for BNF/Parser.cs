@@ -210,6 +210,7 @@ public class Parser
 
     private int ParseInteger()
     {
-        return int.Parse(Consume(TokenType.Integer).Value);
+        string value = Consume(TokenType.Integer).Value;
+        return Convert.ToInt32(value, 8); // Парсим как восьмеричное число
     }
 }

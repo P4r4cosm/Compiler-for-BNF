@@ -54,11 +54,11 @@ namespace Compiler_for_BNF
                 Lexer lexer = new Lexer(code);
                 List<Token> tokens = lexer.Tokenize();
                 var str = new StringBuilder();
-                foreach (Token token in tokens)
-                {
-                    str.AppendLine(token.ToString());
-                }
-                BNFBox.Text = str.ToString();
+                //foreach (Token token in tokens)
+                //{
+                //    str.AppendLine(token.ToString());
+                //}
+                //BNFBox.Text = str.ToString();
                 Parser parser = new Parser(tokens);
                 parser.ParseLanguage();
                 var variables = parser.variables;
@@ -83,7 +83,7 @@ namespace Compiler_for_BNF
             {
 
                 var token = ex.Data["Token"] as Token;
-                MessageBox.Show(token.IndexInText.ToString() + "\n" + token.Size);
+                //MessageBox.Show(token.IndexInText.ToString() + "\n" + token.Size);
                 RichTextBoxHelper.HighlightError(token.IndexInText - token.Size, token.Size);
                 OutputBox.Text = $"Ошибка: {ex.Message}";
             }
