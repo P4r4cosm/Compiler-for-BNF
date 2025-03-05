@@ -68,7 +68,7 @@ namespace Compiler_for_BNF
                     result.Append("Программа корректна\nРезультат: \n");
                     foreach (var variable in variables)
                     {
-                        result.Append($"{variable.Key} = {variable.Value}\n");
+                        result.Append($"{variable.Key} = {Convert.ToString(variable.Value, 8)}\n");
                     }
                     OutputBox.Text = result.ToString();
                 }

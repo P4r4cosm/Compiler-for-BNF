@@ -20,7 +20,25 @@ public class Parser
     {
         Token token = CurrentToken;
         if (token.Type != expectedType || (expectedValue != null && token.Value != expectedValue))
-            throw new SintaxException($"Ожидался {expectedType} со значением '{expectedValue}', а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}", token);
+        {
+            switch (expectedType)
+            {
+                //кидаем исключение если ждали переменную
+                case TokenType.Identifier:
+                    throw new SintaxException($"Ожидалась переменная, " +
+               $"а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}", token); 
+                
+                //кидаем исключение если ждали целое число
+                case TokenType.Integer:
+                    throw new SintaxException($"Ожидалось число, " +
+               $"а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}", token);
+
+                //кидаем исключение если ждали что-то другое
+                default:
+                    throw new SintaxException($"Ожидался {expectedType} со значением '{expectedValue}', " +
+               $"а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}", token);
+            }
+        }
         pos++;
         return token;
     }
@@ -28,6 +46,12 @@ public class Parser
     public void ParseLanguage()
     {
         Consume(TokenType.Keyword, "Начало");
+
+        if (CurrentToken.Type != TokenType.Keyword || (CurrentToken.Value != "First" && CurrentToken.Value != "Second"))
+        {
+            throw new SintaxException("Ожидалось 'First' или 'Second' для множества.", CurrentToken);
+        }
+        ParseMnozhestvo();
 
         while (CurrentToken.Type == TokenType.Keyword && (CurrentToken.Value == "First" || CurrentToken.Value == "Second"))
         {
@@ -43,11 +67,6 @@ public class Parser
         }
 
         Consume(TokenType.Keyword, "Конец");
-
-        foreach (var kvp in variables)
-        {
-            Console.WriteLine($"{kvp.Key} = {kvp.Value}");
-        }
     }
 
     private void ParseMnozhestvo()
@@ -82,10 +101,10 @@ public class Parser
                 secondNumbers.Add(ParseInteger());
             }
 
-            foreach (int value in secondNumbers)
-            {
-                variables[$"int_{value}"] = value;
-            }
+            //foreach (int value in secondNumbers)
+            //{
+            //    variables[$"int_{value}"] = value;
+            //}
         }
         else
         {
@@ -96,12 +115,12 @@ public class Parser
     private void ParseSlagaemoe()
     {
         int value = ParseInteger();
-        variables[$"slag_{value}"] = value;
+        //variables[$"slag_{value}"] = value;
         while (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == ",")
         {
             Consume(TokenType.Punctuation, ",");
             value = ParseInteger();
-            variables[$"slag_{value}"] = value;
+            //variables[$"slag_{value}"] = value;
         }
         Consume(TokenType.Keyword, "Конец слагаемого");
     }
