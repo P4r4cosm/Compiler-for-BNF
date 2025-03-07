@@ -1,5 +1,11 @@
 ﻿Начало
-First A Second 1
+First A, B, C
+Second 1
+Second 56 36 21
+First D, E, F
 3, 4 Конец слагаемого
 1: A = 2
+2: D = 5 + A
+3: C = 10 + D
+4: C = C + 10
 Конец

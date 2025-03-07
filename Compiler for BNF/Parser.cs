@@ -25,18 +25,19 @@ public class Parser
             {
                 //кидаем исключение если ждали переменную
                 case TokenType.Identifier:
-                    throw new SintaxException($"Ожидалась переменная, " +
-               $"а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}", token); 
+
+                    throw new SintaxException($"Вместо {token.Type} {token.Value} должна быть переменная ",token);
+               //     throw new SintaxException($"Ожидалась переменная, " +
+               //$"а получен {token.Type} ('{token.Value}')", token); 
                 
                 //кидаем исключение если ждали целое число
                 case TokenType.Integer:
-                    throw new SintaxException($"Ожидалось число, " +
-               $"а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}", token);
+                    throw new SintaxException($"Вместо {token.Type} {token.Value} должно быть число", token);
 
                 //кидаем исключение если ждали что-то другое
                 default:
                     throw new SintaxException($"Ожидался {expectedType} со значением '{expectedValue}', " +
-               $"а получен {token.Type} ('{token.Value}') в строке {token.Line}, столбце {token.Column}", token);
+               $"а получен {token.Type} ('{token.Value}')", token);
             }
         }
         pos++;
@@ -49,7 +50,7 @@ public class Parser
 
         if (CurrentToken.Type != TokenType.Keyword || (CurrentToken.Value != "First" && CurrentToken.Value != "Second"))
         {
-            throw new SintaxException("Ожидалось 'First' или 'Second' для множества.", CurrentToken);
+            throw new SintaxException("После <Начало> должно идти множество (First/Second)", CurrentToken);
         }
         ParseMnozhestvo();
 
@@ -100,11 +101,6 @@ public class Parser
                 }
                 secondNumbers.Add(ParseInteger());
             }
-
-            //foreach (int value in secondNumbers)
-            //{
-            //    variables[$"int_{value}"] = value;
-            //}
         }
         else
         {
@@ -137,9 +133,17 @@ public class Parser
         string varName = ParseVariable();
         Consume(TokenType.Operator, "=");
         int result = ParsePravChast();
+
+        // Проверка на наличие лишних токенов после выражения
+        if (CurrentToken.Type != TokenType.EndOfFile &&
+            !(CurrentToken.Type == TokenType.Keyword && CurrentToken.Value == "Конец") &&
+            CurrentToken.Type != TokenType.Integer)
+        {
+            throw new SintaxException($"Неожиданный символ '{CurrentToken.Value}' после выражения в операции", CurrentToken);
+        }
+
         variables[varName] = result;
     }
-
     private int ParsePravChast()
     {
         bool isNegative = false;
@@ -196,7 +200,7 @@ public class Parser
         return isNot ? ~result : result;
     }
 
-    private int ParseVyr4()
+     private int ParseVyr4()
     {
         if (CurrentToken.Type == TokenType.Identifier)
         {
@@ -218,7 +222,7 @@ public class Parser
         }
         else
         {
-            throw new SintaxException($"Ошибка в выражении: {CurrentToken}", CurrentToken);
+            throw new SintaxException($"Ошибка в выражении: неожиданный символ '{CurrentToken.Value}'", CurrentToken);
         }
     }
 

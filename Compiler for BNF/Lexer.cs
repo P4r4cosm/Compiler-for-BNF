@@ -111,7 +111,7 @@ namespace Compiler_for_BNF
             {
                 if (!"01234567".Contains(CurrentChar))
                 {
-                    throw new SymbolException($"Недопустимая цифра '{CurrentChar}' для восьмеричной системы в строке {line}, столбце {column}",
+                    throw new SymbolException($"Недопустимая цифра '{CurrentChar}' для восьмеричной системы",
                         new Token(TokenType.Error, CurrentChar.ToString(), line, column, pos));
                 }
                 sb.Append(CurrentChar);
@@ -120,7 +120,7 @@ namespace Compiler_for_BNF
             }
 
             if (!hasDigits)
-                throw new SymbolException($"Ожидалась цифра в строке {line}, столбце {startCol}",
+                throw new SymbolException($"Ожидалась цифра в строке",
                     new Token(TokenType.Error, "", line, startCol, pos));
 
             return new Token(TokenType.Integer, sb.ToString(), line, startCol, pos);
@@ -145,7 +145,7 @@ namespace Compiler_for_BNF
                 token = GetNextToken();
                 if (token.Type==TokenType.Error)
                 {
-                    throw new SymbolException($"Неожиданный символ: {token.Value}, строка: {token.Line} столбец: {token.Column}", token);
+                    throw new SymbolException($"Недопустимый символ: {token.Value}", token);
                 }
                 tokens.Add(token);
             } while (token.Type != TokenType.EndOfFile);
