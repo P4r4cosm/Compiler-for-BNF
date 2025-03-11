@@ -168,7 +168,7 @@ public class Parser
             if (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "+" || CurrentToken.Value == "-"))
             {
                 throw new SintaxException($"В правой части выражения после оператора '{op}' найден оператор '{CurrentToken.Value}'. Нельзя использовать два оператора подряд.", CurrentToken);
-                throw new SintaxException($"В правой части выражения после оператора '{op}' найден оператор '{CurrentToken.Value}'. Нельзя использовать два оператора подряд.", CurrentToken);
+                //throw new SintaxException($"В правой части выражения после оператора '{op}' найден оператор '{CurrentToken.Value}'. Нельзя использовать два оператора подряд.", CurrentToken);
             }
             int next = ParseVyr1();
             result = op == "+" ? result + next : result - next;
