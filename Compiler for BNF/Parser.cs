@@ -21,24 +21,16 @@ public class Parser
         Token token = CurrentToken;
         if (token.Type != expectedType || (expectedValue != null && token.Value != expectedValue))
         {
-            switch (expectedType)
+            string expected = expectedType switch
             {
-                //кидаем исключение если ждали переменную
-                case TokenType.Identifier:
-
-                    throw new SintaxException($"Вместо {token.Type} {token.Value} должна быть переменная ",token);
-               //     throw new SintaxException($"Ожидалась переменная, " +
-               //$"а получен {token.Type} ('{token.Value}')", token); 
-                
-                //кидаем исключение если ждали целое число
-                case TokenType.Integer:
-                    throw new SintaxException($"Вместо {token.Type} {token.Value} должно быть число", token);
-
-                //кидаем исключение если ждали что-то другое
-                default:
-                    throw new SintaxException($"Ожидался {expectedType} со значением '{expectedValue}', " +
-               $"а получен {token.Type} ('{token.Value}')", token);
-            }
+                TokenType.Identifier => "переменная",
+                TokenType.Integer => "целое число",
+                TokenType.Keyword => $"ключевое слово '{expectedValue}'",
+                TokenType.Punctuation => $"знак пунктуации '{expectedValue}'",
+                TokenType.Operator => $"оператор '{expectedValue}'",
+                _ => expectedType.ToString()
+            };
+            throw new SintaxException($"Ожидалась {expected}, а получен {token.Type} ('{token.Value}') в позиции строка {token.Line}, столбец {token.Column}.", token);
         }
         pos++;
         return token;
@@ -80,23 +72,36 @@ public class Parser
             while (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == ",")
             {
                 Consume(TokenType.Punctuation, ",");
+                if (CurrentToken.Type != TokenType.Identifier)
+                {
+                    throw new SintaxException($"В блоке 'First' после запятой ожидалась переменная, а получен {CurrentToken.Type} ('{CurrentToken.Value}').", CurrentToken);
+                }
                 varName = ParseVariable();
                 variables[varName] = 0;
             }
+            // Проверка на пропущенную запятую
+            if (CurrentToken.Type == TokenType.Identifier)
+            {
+                throw new SintaxException($"В блоке 'First' ожидалась запятая после переменной '{varName}', но найдена другая переменная '{CurrentToken.Value}'. Добавьте запятую между '{varName}' и '{CurrentToken.Value}'.", CurrentToken);
+            }
+            //Consume(TokenType.Keyword, "Second");
+            //List<int> secondNumbers = new List<int>();
+            //secondNumbers.Add(ParseInteger());
+            //while (CurrentToken.Type == TokenType.Integer)
+            //{
+            //    secondNumbers.Add(ParseInteger());
+            //}
         }
         else if (CurrentToken.Value == "Second")
         {
+            // Логика для "Second" остается без изменений
             Consume(TokenType.Keyword, "Second");
-            // Читаем целые числа до первой запятой, которая относится к Слагаемому
             List<int> secondNumbers = new List<int>();
             secondNumbers.Add(ParseInteger());
-
             while (CurrentToken.Type == TokenType.Integer)
             {
-                // Смотрим, есть ли запятая после текущего числа
                 if (pos + 1 < tokens.Count && tokens[pos + 1].Type == TokenType.Punctuation && tokens[pos + 1].Value == ",")
                 {
-                    // Если есть запятая, это уже начало Слагаемого, выходим
                     break;
                 }
                 secondNumbers.Add(ParseInteger());
@@ -104,7 +109,7 @@ public class Parser
         }
         else
         {
-            throw new SintaxException("Ожидалось 'First' или 'Second' для множества.", CurrentToken);
+            throw new SintaxException($"Ожидалось ключевое слово 'First' или 'Second' для начала множества, а получен {CurrentToken.Type} ('{CurrentToken.Value}').", CurrentToken);
         }
     }
 
@@ -124,6 +129,10 @@ public class Parser
     private void ParseOper()
     {
         List<int> labels = new List<int>();
+        if (CurrentToken.Type != TokenType.Integer)
+        {
+            throw new SintaxException($"Ожидалась метка (целое число) перед ':', а получен {CurrentToken.Type} ('{CurrentToken.Value}').", CurrentToken);
+        }
         labels.Add(ParseInteger());
         while (CurrentToken.Type == TokenType.Integer)
         {
@@ -134,14 +143,11 @@ public class Parser
         Consume(TokenType.Operator, "=");
         int result = ParsePravChast();
 
-        // Проверка на наличие лишних токенов после выражения
-        if (CurrentToken.Type != TokenType.EndOfFile &&
-            !(CurrentToken.Type == TokenType.Keyword && CurrentToken.Value == "Конец") &&
-            CurrentToken.Type != TokenType.Integer)
+        // Проверка на лишний ':'
+        if (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == ":")
         {
-            throw new SintaxException($"Неожиданный символ '{CurrentToken.Value}' после выражения в операции", CurrentToken);
+            throw new SintaxException($"После завершения оператора '{varName} = ...' найден символ ':'. Возможно, пропущена метка/метки перед ':' для нового оператора, или ':' лишний.", CurrentToken);
         }
-
         variables[varName] = result;
     }
     private int ParsePravChast()
@@ -158,6 +164,12 @@ public class Parser
         while (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "+" || CurrentToken.Value == "-"))
         {
             string op = Consume(TokenType.Operator).Value;
+            // Проверка на два оператора подряд
+            if (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "+" || CurrentToken.Value == "-"))
+            {
+                throw new SintaxException($"В правой части выражения после оператора '{op}' найден оператор '{CurrentToken.Value}'. Нельзя использовать два оператора подряд.", CurrentToken);
+                throw new SintaxException($"В правой части выражения после оператора '{op}' найден оператор '{CurrentToken.Value}'. Нельзя использовать два оператора подряд.", CurrentToken);
+            }
             int next = ParseVyr1();
             result = op == "+" ? result + next : result - next;
         }
