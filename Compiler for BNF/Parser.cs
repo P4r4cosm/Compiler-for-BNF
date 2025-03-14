@@ -168,11 +168,13 @@ public class Parser
         while (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "+" || CurrentToken.Value == "-"))
         {
             string op = Consume(TokenType.Operator).Value;
-            // Проверка на два оператора подряд
-            if (CurrentToken.Type == TokenType.Operator && (CurrentToken.Value == "+" || CurrentToken.Value == "-"))
+            // Проверка на валидный операнд после оператора
+            if (!(CurrentToken.Type == TokenType.Identifier ||
+                  CurrentToken.Type == TokenType.Integer ||
+                  (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == "(") ||
+                  (CurrentToken.Type == TokenType.Keyword && CurrentToken.Value == "not")))
             {
-                throw new SintaxException($"Нельзя использовать два оператора подряд.", CurrentToken);
-                //throw new SintaxException($"В правой части выражения после оператора '{op}' найден оператор '{CurrentToken.Value}'. Нельзя использовать два оператора подряд.", CurrentToken);
+                throw new SintaxException($"Ожидался операнд после оператора '{op}'", CurrentToken);
             }
             int next = ParseVyr1();
             result = op == "+" ? result + next : result - next;
@@ -216,7 +218,7 @@ public class Parser
         return isNot ? ~result : result;
     }
 
-     private int ParseVyr4()
+    private int ParseVyr4()
     {
         if (CurrentToken.Type == TokenType.Identifier)
         {
@@ -227,12 +229,19 @@ public class Parser
         }
         else if (CurrentToken.Type == TokenType.Integer)
         {
-            return ParseInteger();
+            int value = ParseInteger();
+            return value;
         }
         else if (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == "(")
         {
             Consume(TokenType.Punctuation, "(");
             int result = ParsePravChast();
+            if (CurrentToken.Type != TokenType.Punctuation || CurrentToken.Value != ")")
+            {
+                if (CurrentToken.Type == TokenType.Identifier || CurrentToken.Type == TokenType.Integer)
+                    throw new SintaxException($"Пропущен оператор", CurrentToken);
+                throw new SintaxException($"Ожидалась закрывающая скобка ')', но найден '{CurrentToken.Value}'", CurrentToken);
+            }
             Consume(TokenType.Punctuation, ")");
             return result;
         }
