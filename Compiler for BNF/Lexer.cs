@@ -105,27 +105,32 @@ namespace Compiler_for_BNF
         {
             StringBuilder sb = new StringBuilder();
             int startCol = column;
-            bool hasDigits = false;
+            int startPos = pos;
+            bool isValid = true;
 
+            // Собираем все цифры в последовательность
             while (char.IsDigit(CurrentChar))
             {
                 if (!"01234567".Contains(CurrentChar))
                 {
-                    throw new SymbolException($"Недопустимая число '{CurrentChar}' для восьмеричной системы",
-                        new Token(TokenType.Error, CurrentChar.ToString(), line, column, pos));
+                    isValid = false; // Отмечаем, что число содержит недопустимую цифру
                 }
                 sb.Append(CurrentChar);
                 MoveNext();
-                hasDigits = true;
             }
 
-            if (!hasDigits)
-                throw new SymbolException($"Ожидалась цифра в строке",
-                    new Token(TokenType.Error, "", line, startCol, pos));
+            string value = sb.ToString();
 
-            return new Token(TokenType.Integer, sb.ToString(), line, startCol, pos);
+            // Если число невалидно, выбрасываем исключение с указанием всего числа
+            if (!isValid)
+            {
+                throw new SymbolException($"Недопустимое число '{value}' для восьмеричной системы",
+                    new Token(TokenType.Error, value, line, startCol, startPos));
+            }
+
+            // Если валидно, возвращаем токен числа
+            return new Token(TokenType.Integer, value, line, startCol, startPos);
         }
-
         private Token ReadOperatorOrPunctuation()
         {
             string value = CurrentChar.ToString();
