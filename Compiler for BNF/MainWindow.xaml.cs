@@ -31,11 +31,11 @@ namespace Compiler_for_BNF
         {
 
             //Заполняем BNFBox.Text
-            var textReaderBNF = new TextReader("D:\\C# projects\\Compiler for BNF\\Compiler for BNF\\Resources\\BNF.txt");
+            var textReaderBNF = new TextReader("Resources\\BNF.txt");
             BNFBox.Text = await textReaderBNF.GetInfo();
 
             //Заполняем InputBox
-            var textReaderCode = new TextReader("D:\\C# projects\\Compiler for BNF\\Compiler for BNF\\Resources\\StartCode.txt");
+            var textReaderCode = new TextReader("Resources\\StartCode.txt");
             var code = textReaderCode.GetInfo();
             RichTextBoxHelper = new RichTextBoxHelper(InputBox);
             RichTextBoxHelper.SetRichTextBoxText(await code);

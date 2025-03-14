@@ -111,7 +111,7 @@ namespace Compiler_for_BNF
             {
                 if (!"01234567".Contains(CurrentChar))
                 {
-                    throw new SymbolException($"Недопустимая цифра '{CurrentChar}' для восьмеричной системы",
+                    throw new SymbolException($"Недопустимая число '{CurrentChar}' для восьмеричной системы",
                         new Token(TokenType.Error, CurrentChar.ToString(), line, column, pos));
                 }
                 sb.Append(CurrentChar);
