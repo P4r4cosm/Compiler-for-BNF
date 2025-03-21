@@ -86,7 +86,7 @@ public class Parser
             // Проверка на пропущенную запятую
             if (CurrentToken.Type == TokenType.Identifier)
             {
-                throw new SintaxException($"Добавьте запятую между '{varName}' и '{CurrentToken.Value}'.", CurrentToken);
+                throw new SintaxException($"Отсутствует запятая между '{varName}' и '{CurrentToken.Value}'.", CurrentToken);
             }
             //Consume(TokenType.Keyword, "Second");
             //List<int> secondNumbers = new List<int>();
@@ -174,7 +174,7 @@ public class Parser
                   (CurrentToken.Type == TokenType.Punctuation && CurrentToken.Value == "(") ||
                   (CurrentToken.Type == TokenType.Keyword && CurrentToken.Value == "not")))
             {
-                throw new SintaxException($"Ожидался операнд после оператора '{op}'", CurrentToken);
+                throw new SintaxException($"Встречен '{CurrentToken.Value}' после оператора '{op}'", CurrentToken);
             }
             int next = ParseVyr1();
             result = op == "+" ? result + next : result - next;
