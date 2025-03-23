@@ -24,7 +24,7 @@ namespace Compiler_for_BNF
         public int Line { get; }
         public int Column { get; }
         public int Size { get; }
-        public int IndexInText { get; }
+        public int IndexInText { get; set; }
         public Token(TokenType type, string value, int line, int column,int index)
         {
             Type = type;
